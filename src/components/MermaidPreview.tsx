@@ -1,5 +1,18 @@
 import { useEffect, useRef, useState } from "react";
+import mermaid from "mermaid";
 import { Loader2 } from "lucide-react";
+
+// Initialize mermaid once
+mermaid.initialize({
+  startOnLoad: false,
+  theme: "default",
+  securityLevel: "loose",
+  flowchart: {
+    useMaxWidth: true,
+    htmlLabels: true,
+    curve: "basis",
+  },
+});
 
 interface MermaidPreviewProps {
   code: string;
@@ -10,7 +23,7 @@ export function MermaidPreview({ code, className = "" }: MermaidPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [svg, setSvg] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!code.trim()) {
@@ -20,37 +33,39 @@ export function MermaidPreview({ code, className = "" }: MermaidPreviewProps) {
       return;
     }
 
+    let isMounted = true;
     setIsLoading(true);
+    setError(null);
 
     const renderDiagram = async () => {
       try {
-        // Dynamic import mermaid
-        const mermaid = (await import("mermaid")).default;
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: document.documentElement.classList.contains("dark") ? "dark" : "default",
-          securityLevel: "loose",
-          flowchart: {
-            useMaxWidth: true,
-            htmlLabels: true,
-            curve: "basis",
-          },
-        });
-
-        const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+        const id = `mermaid-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         const { svg: renderedSvg } = await mermaid.render(id, code);
-        setSvg(renderedSvg);
-        setError(null);
+        
+        if (isMounted) {
+          setSvg(renderedSvg);
+          setError(null);
+        }
       } catch (err) {
-        setError("Invalid Mermaid syntax");
-        setSvg("");
+        console.error("Mermaid render error:", err);
+        if (isMounted) {
+          setError("Invalid Mermaid syntax");
+          setSvg("");
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    const timeoutId = setTimeout(renderDiagram, 100);
-    return () => clearTimeout(timeoutId);
+    // Small delay to debounce rapid changes
+    const timeoutId = setTimeout(renderDiagram, 150);
+    
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
   }, [code]);
 
   if (isLoading) {
@@ -73,14 +88,6 @@ export function MermaidPreview({ code, className = "" }: MermaidPreviewProps) {
     return (
       <div className={`flex items-center justify-center rounded-lg border border-border bg-muted/30 p-8 text-sm text-muted-foreground ${className}`}>
         Enter Mermaid code to see preview
-      </div>
-    );
-  }
-
-  if (!svg) {
-    return (
-      <div className={`flex items-center justify-center rounded-lg border border-border bg-muted/30 p-8 ${className}`}>
-        <Loader2 className="h-6 w-6 animate-spin text-accent" />
       </div>
     );
   }
