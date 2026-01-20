@@ -1,73 +1,111 @@
-# Welcome to your Lovable project
+# ThreatLens
 
-## Project info
+AI-Powered STRIDE Threat Modeling from Architecture Diagrams.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- 📊 **Diagram Input**: Upload architecture diagram images or paste Mermaid code
+- 🔍 **Component Detection**: AI-powered identification of system components and data flows
+- 🛡️ **STRIDE Analysis**: Comprehensive threat modeling using the STRIDE methodology
+- ✅ **Mitigations**: Actionable security recommendations for each identified threat
+- 📥 **Export**: Download reports in Markdown or PDF format
+- 🌓 **Dark Mode**: Beautiful light and dark themes
 
-There are several ways of editing your application.
+## Getting Started
 
-**Use Lovable**
+### Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- Node.js 18+
+- npm or yarn
 
-Changes made via Lovable will be committed automatically to this repo.
+### Installation
 
-**Use your preferred IDE**
+```bash
+# Install dependencies
+npm install
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Development Mode
 
-**Use GitHub Codespaces**
+The app includes a development mode with mock API responses. To toggle between mock and real API:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. Open `src/lib/api.ts`
+2. Set `DEV_MODE = true` for mock data (default)
+3. Set `DEV_MODE = false` for real API calls
 
-## What technologies are used for this project?
+## Backend Integration
 
-This project is built with:
+The app is prepared to integrate with a backend API:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Endpoint: `POST /api/analyze`
 
-## How can I deploy this project?
+**Request (multipart/form-data):**
+```json
+{
+  "inputType": "image" | "mermaid",
+  "mermaidText": "string (optional)",
+  "diagram": "File (optional)",
+  "analysisDepth": "quick" | "full",
+  "reportFormat": "markdown" | "pdf",
+  "includeSeverity": "boolean",
+  "includeAssumptions": "boolean"
+}
+```
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+**Response:**
+```json
+{
+  "components": [
+    { "id": "string", "type": "string", "name": "string", "trust_zone": "string", "confidence": "number" }
+  ],
+  "data_flows": [
+    { "from": "string", "to": "string", "protocol": "string", "direction": "string", "data_types": ["string"], "confidence": "number" }
+  ],
+  "threats": [
+    { "targetId": "string", "category": "S|T|R|I|D|E", "title": "string", "description": "string", "severity": "low|medium|high" }
+  ],
+  "mitigations": [
+    { "targetId": "string", "title": "string", "steps": ["string"] }
+  ],
+  "assumptions": ["string"],
+  "uncertainties": ["string"],
+  "reportDownloadUrl": "string"
+}
+```
 
-## Can I connect a custom domain to my Lovable project?
+## Tech Stack
 
-Yes, you can!
+- **React 18** + TypeScript
+- **Vite** for development
+- **TailwindCSS** for styling
+- **shadcn/ui** for components
+- **Mermaid.js** for diagram rendering
+- **Lucide React** for icons
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Project Structure
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```
+src/
+├── components/
+│   ├── ui/              # shadcn/ui components
+│   ├── results/         # Analysis result components
+│   ├── Header.tsx       # App header with theme toggle
+│   ├── HeroSection.tsx  # Landing hero section
+│   ├── DiagramInput.tsx # Image/Mermaid input
+│   ├── SettingsPanel.tsx # Analysis settings
+│   └── ...
+├── hooks/
+│   └── useTheme.tsx     # Theme context provider
+├── lib/
+│   ├── api.ts           # API integration
+│   ├── mockData.ts      # Development mock data
+│   ├── types.ts         # TypeScript types
+│   └── utils.ts         # Utilities
+└── pages/
+    └── Index.tsx        # Main page
+```
