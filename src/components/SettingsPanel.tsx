@@ -1,22 +1,27 @@
 import { Settings } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { AnalysisSettings } from "@/types/settings.types";
 
-export interface AnalysisSettings {
-  analysisDepth: "quick" | "full";
-  reportFormat: "markdown" | "pdf";
-  includeSeverity: boolean;
-  includeAssumptions: boolean;
-}
+export type { AnalysisSettings } from "@/types/settings.types";
 
 interface SettingsPanelProps {
   settings: AnalysisSettings;
   onSettingsChange: (settings: AnalysisSettings) => void;
 }
 
-export function SettingsPanel({ settings, onSettingsChange }: SettingsPanelProps) {
+export function SettingsPanel({
+  settings,
+  onSettingsChange,
+}: SettingsPanelProps) {
   return (
     <Card className="border-border/50 shadow-md">
       <CardHeader className="pb-4">
@@ -31,7 +36,10 @@ export function SettingsPanel({ settings, onSettingsChange }: SettingsPanelProps
           <Select
             value={settings.analysisDepth}
             onValueChange={(v) =>
-              onSettingsChange({ ...settings, analysisDepth: v as "quick" | "full" })
+              onSettingsChange({
+                ...settings,
+                analysisDepth: v as "quick" | "full",
+              })
             }
           >
             <SelectTrigger id="depth">
@@ -49,7 +57,10 @@ export function SettingsPanel({ settings, onSettingsChange }: SettingsPanelProps
           <Select
             value={settings.reportFormat}
             onValueChange={(v) =>
-              onSettingsChange({ ...settings, reportFormat: v as "markdown" | "pdf" })
+              onSettingsChange({
+                ...settings,
+                reportFormat: v as "markdown" | "pdf",
+              })
             }
           >
             <SelectTrigger id="format">
@@ -65,24 +76,32 @@ export function SettingsPanel({ settings, onSettingsChange }: SettingsPanelProps
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label htmlFor="severity">Include Severity</Label>
-            <p className="text-xs text-muted-foreground">Show Low/Med/High ratings</p>
+            <p className="text-xs text-muted-foreground">
+              Show Low/Med/High ratings
+            </p>
           </div>
           <Switch
             id="severity"
             checked={settings.includeSeverity}
-            onCheckedChange={(v) => onSettingsChange({ ...settings, includeSeverity: v })}
+            onCheckedChange={(v) =>
+              onSettingsChange({ ...settings, includeSeverity: v })
+            }
           />
         </div>
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label htmlFor="assumptions">Include Assumptions</Label>
-            <p className="text-xs text-muted-foreground">Show uncertainties & assumptions</p>
+            <p className="text-xs text-muted-foreground">
+              Show uncertainties & assumptions
+            </p>
           </div>
           <Switch
             id="assumptions"
             checked={settings.includeAssumptions}
-            onCheckedChange={(v) => onSettingsChange({ ...settings, includeAssumptions: v })}
+            onCheckedChange={(v) =>
+              onSettingsChange({ ...settings, includeAssumptions: v })
+            }
           />
         </div>
       </CardContent>
