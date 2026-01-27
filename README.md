@@ -1,6 +1,6 @@
 # 🔒 ThreatLens Analyzer
 
-Sistema completo de análise automatizada de ameaças STRIDE para diagramas de arquitetura de software, utilizando IA (GPT-4 Vision) para identificar vulnerabilidades e sugerir mitigações.
+Sistema completo de análise automatizada de ameaças STRIDE para diagramas de arquitetura de software, utilizando IA (GPT-5.2 Vision e GPT-5 Reasoning) para identificar vulnerabilidades e sugerir mitigações.
 
 ## 📋 Visão Geral
 
@@ -15,7 +15,7 @@ Sistema completo de análise automatizada de ameaças STRIDE para diagramas de a
 
 - **Python 3.8+** (backend)
 - **Node.js 18+** ou **Bun** (frontend)
-- **Chave API OpenAI** com acesso ao GPT-4
+- **Chave API OpenAI** com acesso ao GPT-5.2 e GPT-5
 
 ### 1️⃣ Backend (API)
 
@@ -79,7 +79,7 @@ Crie um arquivo `.env` na pasta `backend/` com:
 OPENAI_API_KEY=sk-proj-your-key-here
 OPENAI_VISION_MODEL=gpt-5.2
 OPENAI_TEXT_MODEL=gpt-5
-OPENAI_MAX_TOKENS=4000
+OPENAI_MAX_TOKENS=16000
 API_HOST=0.0.0.0
 API_PORT=5000
 DEBUG=True
@@ -98,7 +98,7 @@ export const API_CONFIG = {
     ANALYZE_MERMAID: "/api/analyze/mermaid",
     DOWNLOAD_REPORT: "/api/report/download",
   },
-  TIMEOUT: 120000, // 2 minutos
+  TIMEOUT: 600000, // 10 minutos
 };
 ```
 
@@ -246,7 +246,3 @@ Contribuições são bem-vindas! Por favor:
 ## 📧 Contato
 
 Para dúvidas ou suporte, abra uma issue no GitHub.
-
----
-
-**Desenvolvido com ❤️ usando IA e boas práticas de segurança**
