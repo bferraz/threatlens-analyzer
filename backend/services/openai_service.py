@@ -29,24 +29,25 @@ class OpenAIService:
         
         prompt = """Analyze this software architecture diagram and identify security threats using STRIDE methodology.
 
-IMPORTANT: Return ONLY valid JSON (no markdown, no extra text) with this EXACT structure:
-{
-  "components": [{"id": "api", "type": "service", "name": "API Gateway", "trust_zone": "dmz", "confidence": 0.9}],
-  "data_flows": [{"from": "user", "to": "api", "protocol": "HTTPS", "direction": "bidirectional", "data_types": ["credentials"], "confidence": 0.9}],
-  "threats": [{"targetId": "api", "category": "S", "title": "Auth bypass", "description": "Risk of authentication bypass", "severity": "high"}],
-  "mitigations": [{"targetId": "api", "title": "Implement MFA", "steps": ["Enable MFA", "Use OAuth2", "Add rate limiting"]}],
-  "assumptions": ["HTTPS is used"],
-  "uncertainties": ["Database encryption status"]
-}
+        IMPORTANT: Return ONLY valid JSON (no markdown, no extra text) with this EXACT structure:
+        {
+        "components": [{"id": "api", "type": "service", "name": "API Gateway", "trust_zone": "dmz", "confidence": 0.9}],
+        "data_flows": [{"from": "user", "to": "api", "protocol": "HTTPS", "direction": "bidirectional", "data_types": ["credentials"], "confidence": 0.9}],
+        "threats": [{"targetId": "api", "category": "S", "title": "Auth bypass", "description": "Risk of authentication bypass", "severity": "high"}],
+        "mitigations": [{"targetId": "api", "title": "Implement MFA", "steps": ["Enable MFA", "Use OAuth2", "Add rate limiting"]}],
+        "assumptions": ["HTTPS is used"],
+        "uncertainties": ["Database encryption status"]
+        }
 
-RULES:
-- trust_zone must be one of: "external", "internet", "public", "dmz", "internal", "private"
-- category must be one of: "S", "T", "R", "I", "D", "E" (STRIDE)
-- severity must be one of: "low", "medium", "high", "critical"
-- direction must be: "unidirectional" or "bidirectional"
-- confidence must be between 0.7 and 1.0
+        RULES:
+        - trust_zone must be one of: "external", "internet", "public", "dmz", "internal", "private"
+        - category must be one of: "S", "T", "R", "I", "D", "E" (STRIDE)
+        - severity must be one of: "low", "medium", "high", "critical"
+        - direction must be: "unidirectional" or "bidirectional"
+        - confidence must be between 0.7 and 1.0
 
-Generate at least: 3 components, 2 data_flows, 5 threats (covering S,T,R,I,D,E categories), 3 mitigations."""
+        Generate at least: 3 components, 2 data_flows, 5 threats (covering S,T,R,I,D,E categories), 3 mitigations.
+        """
         
         return prompt
     
