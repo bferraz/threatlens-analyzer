@@ -37,7 +37,7 @@ graph TB
     end
     
     subgraph "Storage"
-        Reports[(Reports<br/>Markdown/PDF)]
+        Reports[(Reports<br/>Markdown)]
     end
     
     UI --> Components
@@ -110,7 +110,7 @@ sequenceDiagram
     OpenAI-->>Analyzer: 18. Mitigações + Passos
     
     Analyzer->>ReportGen: 19. Gerar Relatório
-    ReportGen->>Storage: 20. Salvar .md e .pdf
+    ReportGen->>Storage: 20. Salvar .md
     Storage-->>ReportGen: 21. ✓ Salvo
     
     ReportGen-->>Analyzer: 22. URL do Relatório
@@ -124,7 +124,7 @@ sequenceDiagram
     User->>UI: 27. Download Relatório
     UI->>API: 28. GET /api/report/download/{id}
     API->>Storage: 29. Buscar Arquivo
-    Storage-->>API: 30. Arquivo (.md ou .pdf)
+    Storage-->>API: 30. Arquivo (.md)
     API-->>UI: 31. Stream de Bytes
     UI-->>User: 32. 💾 Download Iniciado
     
@@ -143,7 +143,7 @@ sequenceDiagram
 - **Serviços**:
   - `analyzer.py`: Coordena o processo de análise STRIDE
   - `openai_service.py`: Integração com APIs da OpenAI
-  - `report_generator.py`: Geração de relatórios Markdown e PDF
+  - `report_generator.py`: Geração de relatórios em Markdown
   - `validators.py`: Validação de entrada e formato de dados
 
 #### 🤖 Camada de IA (OpenAI)
@@ -298,7 +298,7 @@ graph TD
 
 ### 4. Relatórios
 
-Geração automática de relatórios em **Markdown** ou **PDF** com:
+Geração automática de relatórios em **Markdown** com:
 - Componentes identificados
 - Fluxos de dados
 - Ameaças encontradas (com severidade)
@@ -345,7 +345,7 @@ Upload de imagem (multipart/form-data) para análise.
 Análise de código Mermaid (JSON).
 
 ### GET /api/report/download/{filename}
-Download de relatório gerado (.md ou .pdf).
+Download de relatório gerado (.md).
 
 ## 🛠️ Tecnologias
 
@@ -354,7 +354,6 @@ Download de relatório gerado (.md ou .pdf).
 - **OpenAI GPT-5.2** - Análise avançada de imagens com visão
 - **OpenAI GPT-5** - Raciocínio inteligente para texto e código
 - **Pydantic** - Validação de dados
-- **WeasyPrint** - Geração de PDFs
 - **Uvicorn** - Servidor ASGI
 
 ### Frontend
