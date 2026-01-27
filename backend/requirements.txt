@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+openai
+python-dotenv
+python-multipart
+weasyprint
+markdown
+aiofiles
