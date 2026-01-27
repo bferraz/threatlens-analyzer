@@ -9,6 +9,173 @@ Sistema completo de análise automatizada de ameaças STRIDE para diagramas de a
 - ⚡ **Backend**: API REST FastAPI com integração OpenAI
 - 🤖 **IA**: GPT-5.2 (Vision) e GPT-5 para análise de diagramas
 
+## 🏛️ Arquitetura do Sistema
+
+### Visão Geral da Arquitetura
+
+O ThreatLens Analyzer segue uma arquitetura de três camadas, separando claramente a interface do usuário, a lógica de negócio e os serviços de IA:
+
+```mermaid
+graph TB
+    subgraph "Frontend Layer"
+        UI[React UI]
+        Components[Componentes UI]
+        Services[Services HTTP]
+    end
+    
+    subgraph "Backend Layer"
+        API[FastAPI REST API]
+        Analyzer[Analyzer Service]
+        ReportGen[Report Generator]
+        Validators[Validators]
+    end
+    
+    subgraph "AI Layer"
+        OpenAI[OpenAI Service]
+        GPT52[GPT-5.2 Vision]
+        GPT5[GPT-5 Text]
+    end
+    
+    subgraph "Storage"
+        Reports[(Reports<br/>Markdown/PDF)]
+    end
+    
+    UI --> Components
+    Components --> Services
+    Services -->|HTTP/REST| API
+    
+    API --> Validators
+    API --> Analyzer
+    Analyzer --> OpenAI
+    Analyzer --> ReportGen
+    
+    OpenAI --> GPT52
+    OpenAI --> GPT5
+    
+    ReportGen --> Reports
+    
+    style Frontend Layer fill:#e3f2fd
+    style Backend Layer fill:#fff3e0
+    style AI Layer fill:#f3e5f5
+    style Storage fill:#e8f5e9
+```
+
+### Fluxo de Análise Completo
+
+Este diagrama mostra o fluxo completo desde o upload do diagrama até a geração do relatório final:
+
+```mermaid
+sequenceDiagram
+    participant User as 👤 Usuário
+    participant UI as 🖥️ Frontend<br/>(React)
+    participant API as ⚡ Backend API<br/>(FastAPI)
+    participant Validator as ✅ Validator
+    participant Analyzer as 🔍 Analyzer
+    participant OpenAI as 🤖 OpenAI Service
+    participant Vision as 👁️ GPT-5.2 Vision
+    participant Text as 💬 GPT-5 Text
+    participant ReportGen as 📄 Report Generator
+    participant Storage as 💾 Storage
+    
+    User->>UI: 1. Upload Diagrama<br/>(Imagem ou Mermaid)
+    UI->>UI: 2. Validação Local<br/>(formato, tamanho)
+    
+    UI->>API: 3. POST /api/analyze/*<br/>(multipart ou JSON)
+    
+    API->>Validator: 4. Validar Request
+    Validator-->>API: 5. ✓ Válido
+    
+    API->>Analyzer: 6. Iniciar Análise
+    
+    alt Análise de Imagem
+        Analyzer->>OpenAI: 7a. Processar Imagem
+        OpenAI->>Vision: 8a. Analisar com GPT-5.2
+        Vision-->>OpenAI: 9a. Componentes + Fluxos
+    else Análise de Mermaid
+        Analyzer->>OpenAI: 7b. Processar Código
+        OpenAI->>Text: 8b. Analisar com GPT-5
+        Text-->>OpenAI: 9b. Componentes + Fluxos
+    end
+    
+    OpenAI-->>Analyzer: 10. Componentes Identificados
+    
+    Analyzer->>OpenAI: 11. Identificar Ameaças STRIDE
+    OpenAI->>Text: 12. GPT-5 + Reasoning
+    Text-->>OpenAI: 13. Lista de Ameaças
+    OpenAI-->>Analyzer: 14. Ameaças por Categoria
+    
+    Analyzer->>OpenAI: 15. Sugerir Mitigações
+    OpenAI->>Text: 16. GPT-5 + Best Practices
+    Text-->>OpenAI: 17. Mitigações Detalhadas
+    OpenAI-->>Analyzer: 18. Mitigações + Passos
+    
+    Analyzer->>ReportGen: 19. Gerar Relatório
+    ReportGen->>Storage: 20. Salvar .md e .pdf
+    Storage-->>ReportGen: 21. ✓ Salvo
+    
+    ReportGen-->>Analyzer: 22. URL do Relatório
+    Analyzer-->>API: 23. Resultado Completo
+    
+    API-->>UI: 24. JSON Response<br/>(componentes, ameaças,<br/>mitigações, report_url)
+    
+    UI->>UI: 25. Renderizar Resultados
+    UI-->>User: 26. 🎉 Exibir Análise
+    
+    User->>UI: 27. Download Relatório
+    UI->>API: 28. GET /api/report/download/{id}
+    API->>Storage: 29. Buscar Arquivo
+    Storage-->>API: 30. Arquivo (.md ou .pdf)
+    API-->>UI: 31. Stream de Bytes
+    UI-->>User: 32. 💾 Download Iniciado
+    
+    Note over User,Storage: Tempo total: ~30-60 segundos
+```
+
+### Componentes Principais
+
+#### 🎨 Frontend (React + TypeScript)
+- **Responsabilidade**: Interface do usuário, validação de entrada, exibição de resultados
+- **Tecnologias**: React 18, TypeScript, Vite, Tailwind CSS, Shadcn/ui
+- **Comunicação**: HTTP REST com Backend
+
+#### ⚡ Backend (FastAPI)
+- **Responsabilidade**: Orquestração da análise, validação, geração de relatórios
+- **Serviços**:
+  - `analyzer.py`: Coordena o processo de análise STRIDE
+  - `openai_service.py`: Integração com APIs da OpenAI
+  - `report_generator.py`: Geração de relatórios Markdown e PDF
+  - `validators.py`: Validação de entrada e formato de dados
+
+#### 🤖 Camada de IA (OpenAI)
+- **GPT-5.2 Vision**: Análise de diagramas em imagens
+- **GPT-5 Text**: Análise de código Mermaid, identificação de ameaças e sugestão de mitigações
+- **Reasoning**: Raciocínio profundo para análise de segurança
+
+### Tipos de Análise
+
+#### 1️⃣ Análise de Imagem
+```
+Upload PNG/JPG → Base64 Encoding → GPT-5.2 Vision → Extração de Componentes → Análise STRIDE
+```
+
+#### 2️⃣ Análise de Mermaid
+```
+Código Mermaid → Validação de Sintaxe → GPT-5 Text → Interpretação → Análise STRIDE
+```
+
+### Metodologia STRIDE
+
+O sistema identifica ameaças nas 6 categorias:
+
+| Categoria | Foco | Exemplo |
+|-----------|------|---------|
+| **S**poofing | Autenticação | Falta de MFA, tokens fracos |
+| **T**ampering | Integridade | Comunicação não criptografada |
+| **R**epudiation | Auditoria | Falta de logs de ações |
+| **I**nformation Disclosure | Confidencialidade | Dados sensíveis expostos |
+| **D**enial of Service | Disponibilidade | Falta de rate limiting |
+| **E**levation of Privilege | Autorização | Controle de acesso inadequado |
+
 ## 🚀 Como Executar
 
 ### Pré-requisitos
@@ -233,16 +400,3 @@ bun test
 ## 📝 Licença
 
 MIT License - veja [LICENSE](backend/LICENSE) para detalhes.
-
-## 👥 Contribuindo
-
-Contribuições são bem-vindas! Por favor:
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
-## 📧 Contato
-
-Para dúvidas ou suporte, abra uma issue no GitHub.
