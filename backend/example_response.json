@@ -1,0 +1,321 @@
+{
+  "description": "Example response from ThreatLens Analyzer API showing expected structure",
+  "example_analysis": {
+    "components": [
+      {
+        "id": "user",
+        "type": "external",
+        "name": "End User / Client",
+        "trust_zone": "external",
+        "confidence": 0.95
+      },
+      {
+        "id": "api_gateway",
+        "type": "gateway",
+        "name": "API Gateway",
+        "trust_zone": "dmz",
+        "confidence": 0.96
+      },
+      {
+        "id": "auth_service",
+        "type": "service",
+        "name": "Authentication Service",
+        "trust_zone": "internal",
+        "confidence": 0.94
+      },
+      {
+        "id": "data_service",
+        "type": "service",
+        "name": "Data Processing Service",
+        "trust_zone": "internal",
+        "confidence": 0.93
+      },
+      {
+        "id": "database",
+        "type": "database",
+        "name": "Primary Database",
+        "trust_zone": "internal",
+        "confidence": 0.97
+      },
+      {
+        "id": "cache",
+        "type": "cache",
+        "name": "Redis Cache",
+        "trust_zone": "internal",
+        "confidence": 0.92
+      },
+      {
+        "id": "queue",
+        "type": "queue",
+        "name": "Message Queue",
+        "trust_zone": "internal",
+        "confidence": 0.91
+      }
+    ],
+    "data_flows": [
+      {
+        "from": "user",
+        "to": "api_gateway",
+        "protocol": "HTTPS",
+        "direction": "bidirectional",
+        "data_types": ["credentials", "api_requests", "user_data"],
+        "confidence": 0.96
+      },
+      {
+        "from": "api_gateway",
+        "to": "auth_service",
+        "protocol": "gRPC",
+        "direction": "bidirectional",
+        "data_types": ["authentication_tokens", "user_credentials"],
+        "confidence": 0.94
+      },
+      {
+        "from": "api_gateway",
+        "to": "data_service",
+        "protocol": "gRPC",
+        "direction": "bidirectional",
+        "data_types": ["business_data", "query_requests"],
+        "confidence": 0.93
+      },
+      {
+        "from": "auth_service",
+        "to": "database",
+        "protocol": "TCP",
+        "direction": "bidirectional",
+        "data_types": ["user_credentials", "session_data"],
+        "confidence": 0.95
+      },
+      {
+        "from": "data_service",
+        "to": "database",
+        "protocol": "TCP",
+        "direction": "bidirectional",
+        "data_types": ["business_data", "queries"],
+        "confidence": 0.94
+      },
+      {
+        "from": "data_service",
+        "to": "cache",
+        "protocol": "Redis",
+        "direction": "bidirectional",
+        "data_types": ["cached_data", "session_info"],
+        "confidence": 0.92
+      },
+      {
+        "from": "data_service",
+        "to": "queue",
+        "protocol": "AMQP",
+        "direction": "unidirectional",
+        "data_types": ["async_tasks", "events"],
+        "confidence": 0.9
+      }
+    ],
+    "threats": [
+      {
+        "targetId": "api_gateway",
+        "category": "S",
+        "title": "API Gateway Spoofing Attack",
+        "description": "Attackers may impersonate the API Gateway to intercept or manipulate client requests. Without proper certificate validation and mutual TLS, clients cannot verify the authenticity of the gateway.",
+        "severity": "high"
+      },
+      {
+        "targetId": "auth_service",
+        "category": "S",
+        "title": "Authentication Token Forgery",
+        "description": "Weak token generation or validation mechanisms could allow attackers to forge authentication tokens and impersonate legitimate users.",
+        "severity": "high"
+      },
+      {
+        "targetId": "database",
+        "category": "T",
+        "title": "Database Tampering via SQL Injection",
+        "description": "Insufficient input validation in services could lead to SQL injection attacks, allowing unauthorized modification of database records.",
+        "severity": "high"
+      },
+      {
+        "targetId": "data_service",
+        "category": "T",
+        "title": "Data Integrity Violation",
+        "description": "Lack of integrity checks on data flows could allow attackers to modify data in transit between services.",
+        "severity": "medium"
+      },
+      {
+        "targetId": "auth_service",
+        "category": "R",
+        "title": "Insufficient Authentication Logging",
+        "description": "Without comprehensive audit logs, failed authentication attempts and suspicious activities cannot be traced or investigated.",
+        "severity": "medium"
+      },
+      {
+        "targetId": "api_gateway",
+        "category": "R",
+        "title": "Request Repudiation Risk",
+        "description": "Lack of non-repudiation mechanisms allows users to deny actions performed through the API gateway.",
+        "severity": "low"
+      },
+      {
+        "targetId": "database",
+        "category": "I",
+        "title": "Database Credential Exposure",
+        "description": "Database credentials stored in configuration files or environment variables without encryption pose a significant information disclosure risk.",
+        "severity": "high"
+      },
+      {
+        "targetId": "cache",
+        "category": "I",
+        "title": "Sensitive Data Leakage in Cache",
+        "description": "Caching sensitive information without encryption could expose confidential data if the cache is compromised.",
+        "severity": "medium"
+      },
+      {
+        "targetId": "queue",
+        "category": "I",
+        "title": "Message Queue Data Exposure",
+        "description": "Unencrypted messages in the queue could be intercepted, revealing sensitive business data or user information.",
+        "severity": "medium"
+      },
+      {
+        "targetId": "api_gateway",
+        "category": "D",
+        "title": "API Rate Limiting Bypass",
+        "description": "Insufficient rate limiting allows attackers to overwhelm the API gateway with requests, causing denial of service.",
+        "severity": "high"
+      },
+      {
+        "targetId": "data_service",
+        "category": "D",
+        "title": "Resource Exhaustion Attack",
+        "description": "Processing expensive queries without resource limits could exhaust service resources and cause service disruption.",
+        "severity": "medium"
+      },
+      {
+        "targetId": "database",
+        "category": "D",
+        "title": "Database Connection Pool Exhaustion",
+        "description": "Uncontrolled connection creation could exhaust database connection pools, preventing legitimate requests.",
+        "severity": "medium"
+      },
+      {
+        "targetId": "auth_service",
+        "category": "E",
+        "title": "Privilege Escalation via Token Manipulation",
+        "description": "Weak authorization checks could allow users to escalate privileges by manipulating authentication tokens.",
+        "severity": "high"
+      },
+      {
+        "targetId": "data_service",
+        "category": "E",
+        "title": "Unauthorized Data Access",
+        "description": "Insufficient authorization controls could allow users to access data beyond their permission level.",
+        "severity": "high"
+      },
+      {
+        "targetId": "api_gateway",
+        "category": "E",
+        "title": "API Gateway Authorization Bypass",
+        "description": "Flaws in the gateway's authorization logic could allow attackers to bypass access controls and reach protected endpoints.",
+        "severity": "high"
+      }
+    ],
+    "mitigations": [
+      {
+        "targetId": "api_gateway",
+        "title": "Implement Comprehensive API Security Controls",
+        "steps": [
+          "Deploy mutual TLS (mTLS) for client authentication",
+          "Implement rate limiting with adaptive throttling (e.g., 100 requests/minute per IP)",
+          "Add request signing to prevent tampering",
+          "Enable WAF (Web Application Firewall) with OWASP rules",
+          "Implement comprehensive logging and monitoring"
+        ]
+      },
+      {
+        "targetId": "auth_service",
+        "title": "Strengthen Authentication Mechanisms",
+        "steps": [
+          "Use strong JWT tokens with RS256 signing algorithm",
+          "Implement token rotation and expiration (15-minute access tokens)",
+          "Add multi-factor authentication (MFA) for sensitive operations",
+          "Deploy comprehensive audit logging for all authentication events",
+          "Implement account lockout after 5 failed attempts"
+        ]
+      },
+      {
+        "targetId": "database",
+        "title": "Secure Database Access and Operations",
+        "steps": [
+          "Use parameterized queries and prepared statements exclusively",
+          "Encrypt data at rest using AES-256 encryption",
+          "Implement database-level access controls and least privilege",
+          "Enable database audit logging for all modifications",
+          "Use encrypted connections (TLS) for all database communications"
+        ]
+      },
+      {
+        "targetId": "data_service",
+        "title": "Implement Data Protection Controls",
+        "steps": [
+          "Add input validation and sanitization for all requests",
+          "Implement fine-grained authorization checks (ABAC or RBAC)",
+          "Add data integrity verification using checksums or signatures",
+          "Implement connection pooling with max limits (e.g., 20 connections)",
+          "Add circuit breakers for dependent service failures"
+        ]
+      },
+      {
+        "targetId": "cache",
+        "title": "Secure Cache Implementation",
+        "steps": [
+          "Encrypt sensitive data before caching",
+          "Use Redis authentication (requirepass)",
+          "Enable Redis TLS for encrypted connections",
+          "Implement cache key namespacing to prevent collisions",
+          "Set appropriate TTL values to minimize exposure"
+        ]
+      },
+      {
+        "targetId": "queue",
+        "title": "Secure Message Queue Operations",
+        "steps": [
+          "Encrypt messages using envelope encryption",
+          "Implement message signing for integrity verification",
+          "Use authenticated AMQP connections with TLS",
+          "Add message validation and schema enforcement",
+          "Implement dead letter queues for failed messages"
+        ]
+      }
+    ],
+    "assumptions": [
+      "All services are deployed in a trusted private network",
+      "HTTPS/TLS is properly configured with valid certificates",
+      "Database credentials are managed using a secrets management system",
+      "Regular security patches and updates are applied to all components"
+    ],
+    "uncertainties": [
+      "The specific authentication mechanism (OAuth, JWT, etc.) is not clearly specified",
+      "Data encryption methods for sensitive information are not detailed in the diagram",
+      "Network segmentation and firewall rules between trust zones are unclear"
+    ],
+    "reportDownloadUrl": "/api/report/download/550e8400-e29b-41d4-a716-446655440000.md"
+  },
+  "notes": {
+    "components_count": 7,
+    "data_flows_count": 7,
+    "threats_count": 15,
+    "threats_by_category": {
+      "S": 2,
+      "T": 2,
+      "R": 2,
+      "I": 3,
+      "D": 3,
+      "E": 3
+    },
+    "threats_by_severity": {
+      "high": 8,
+      "medium": 6,
+      "low": 1
+    },
+    "mitigations_count": 6,
+    "confidence_range": "0.90 to 0.97"
+  }
+}

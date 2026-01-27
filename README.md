@@ -1,111 +1,252 @@
-# ThreatLens
+# 🔒 ThreatLens Analyzer
 
-AI-Powered STRIDE Threat Modeling from Architecture Diagrams.
+Sistema completo de análise automatizada de ameaças STRIDE para diagramas de arquitetura de software, utilizando IA (GPT-4 Vision) para identificar vulnerabilidades e sugerir mitigações.
 
-## Features
+## 📋 Visão Geral
 
-- 📊 **Diagram Input**: Upload architecture diagram images or paste Mermaid code
-- 🔍 **Component Detection**: AI-powered identification of system components and data flows
-- 🛡️ **STRIDE Analysis**: Comprehensive threat modeling using the STRIDE methodology
-- ✅ **Mitigations**: Actionable security recommendations for each identified threat
-- 📥 **Export**: Download reports in Markdown or PDF format
-- 🌓 **Dark Mode**: Beautiful light and dark themes
+**ThreatLens Analyzer** combina:
+- 🎨 **Frontend**: Interface React moderna e responsiva
+- ⚡ **Backend**: API REST FastAPI com integração OpenAI
+- 🤖 **IA**: GPT-5.2 (Vision) e GPT-5 para análise de diagramas
 
-## Getting Started
+## 🚀 Como Executar
 
-### Prerequisites
+### Pré-requisitos
 
-- Node.js 18+
-- npm or yarn
+- **Python 3.8+** (backend)
+- **Node.js 18+** ou **Bun** (frontend)
+- **Chave API OpenAI** com acesso ao GPT-4
 
-### Installation
+### 1️⃣ Backend (API)
 
 ```bash
-# Install dependencies
+# Navegar para o diretório backend
+cd backend
+
+# Criar ambiente virtual
+python -m venv venv
+
+# Ativar ambiente virtual
+# Windows:
+venv\Scripts\activate
+# Linux/Mac:
+source venv/bin/activate
+
+# Instalar dependências
+pip install -r requirements.txt
+
+# Configurar variáveis de ambiente
+# Copie o arquivo .env.example para .env e adicione sua chave OpenAI
+cp .env.example .env
+# Edite o .env e adicione: OPENAI_API_KEY=sk-...
+
+# Executar servidor
+python main.py
+# ou
+uvicorn main:app --reload --port 5000
+```
+
+O backend estará disponível em: **http://localhost:5000**
+
+Documentação Swagger: **http://localhost:5000/docs**
+
+### 2️⃣ Frontend (Interface Web)
+
+```bash
+# Navegar para o diretório frontend
+cd front
+
+# Instalar dependências
 npm install
+# ou com Bun:
+bun install
 
-# Start development server
+# Executar servidor de desenvolvimento
 npm run dev
+# ou com Bun:
+bun dev
 ```
 
-The app will be available at `http://localhost:5173`
+O frontend estará disponível em: **http://localhost:5173**
 
-## Development Mode
+### 3️⃣ Configuração
 
-The app includes a development mode with mock API responses. To toggle between mock and real API:
+#### Backend (.env)
 
-1. Open `src/lib/api.ts`
-2. Set `DEV_MODE = true` for mock data (default)
-3. Set `DEV_MODE = false` for real API calls
+Crie um arquivo `.env` na pasta `backend/` com:
 
-## Backend Integration
-
-The app is prepared to integrate with a backend API:
-
-### Endpoint: `POST /api/analyze`
-
-**Request (multipart/form-data):**
-```json
-{
-  "inputType": "image" | "mermaid",
-  "mermaidText": "string (optional)",
-  "diagram": "File (optional)",
-  "analysisDepth": "quick" | "full",
-  "reportFormat": "markdown" | "pdf",
-  "includeSeverity": "boolean",
-  "includeAssumptions": "boolean"
-}
+```env
+OPENAI_API_KEY=sk-proj-your-key-here
+OPENAI_VISION_MODEL=gpt-5.2
+OPENAI_TEXT_MODEL=gpt-5
+OPENAI_MAX_TOKENS=4000
+API_HOST=0.0.0.0
+API_PORT=5000
+DEBUG=True
+CORS_ORIGINS=["http://localhost:5173"]
 ```
 
-**Response:**
-```json
-{
-  "components": [
-    { "id": "string", "type": "string", "name": "string", "trust_zone": "string", "confidence": "number" }
-  ],
-  "data_flows": [
-    { "from": "string", "to": "string", "protocol": "string", "direction": "string", "data_types": ["string"], "confidence": "number" }
-  ],
-  "threats": [
-    { "targetId": "string", "category": "S|T|R|I|D|E", "title": "string", "description": "string", "severity": "low|medium|high" }
-  ],
-  "mitigations": [
-    { "targetId": "string", "title": "string", "steps": ["string"] }
-  ],
-  "assumptions": ["string"],
-  "uncertainties": ["string"],
-  "reportDownloadUrl": "string"
-}
+#### Frontend (api.config.ts)
+
+O arquivo `front/src/config/api.config.ts` já está configurado para o backend local:
+
+```typescript
+export const API_CONFIG = {
+  BASE_URL: "http://localhost:5000",
+  ENDPOINTS: {
+    ANALYZE_IMAGE: "/api/analyze/image",
+    ANALYZE_MERMAID: "/api/analyze/mermaid",
+    DOWNLOAD_REPORT: "/api/report/download",
+  },
+  TIMEOUT: 120000, // 2 minutos
+};
 ```
 
-## Tech Stack
+## 📖 Funcionalidades
 
-- **React 18** + TypeScript
-- **Vite** for development
-- **TailwindCSS** for styling
-- **shadcn/ui** for components
-- **Mermaid.js** for diagram rendering
-- **Lucide React** for icons
+### 1. Análise de Imagens
 
-## Project Structure
+Upload de diagramas de arquitetura (PNG, JPG, JPEG) para análise automática de ameaças STRIDE.
+
+### 2. Análise de Código Mermaid
+
+Análise de diagramas definidos em código Mermaid.
+
+Exemplo:
+```mermaid
+graph TD
+    User[User] -->|HTTPS| API[API Gateway]
+    API -->|gRPC| Service[Backend Service]
+    Service -->|SQL| DB[(Database)]
+```
+
+### 3. Categorias STRIDE
+
+- **S** - Spoofing (Falsificação de identidade)
+- **T** - Tampering (Adulteração de dados)
+- **R** - Repudiation (Repúdio de ações)
+- **I** - Information Disclosure (Vazamento de informações)
+- **D** - Denial of Service (Negação de serviço)
+- **E** - Elevation of Privilege (Escalação de privilégios)
+
+### 4. Relatórios
+
+Geração automática de relatórios em **Markdown** ou **PDF** com:
+- Componentes identificados
+- Fluxos de dados
+- Ameaças encontradas (com severidade)
+- Mitigações sugeridas (com passos detalhados)
+- Suposições e incertezas
+
+## 🏗️ Estrutura do Projeto
 
 ```
-src/
-├── components/
-│   ├── ui/              # shadcn/ui components
-│   ├── results/         # Analysis result components
-│   ├── Header.tsx       # App header with theme toggle
-│   ├── HeroSection.tsx  # Landing hero section
-│   ├── DiagramInput.tsx # Image/Mermaid input
-│   ├── SettingsPanel.tsx # Analysis settings
-│   └── ...
-├── hooks/
-│   └── useTheme.tsx     # Theme context provider
-├── lib/
-│   ├── api.ts           # API integration
-│   ├── mockData.ts      # Development mock data
-│   ├── types.ts         # TypeScript types
-│   └── utils.ts         # Utilities
-└── pages/
-    └── Index.tsx        # Main page
+threatlens-analyzer/
+├── backend/              # API FastAPI
+│   ├── config/          # Configurações
+│   ├── models/          # Modelos Pydantic
+│   ├── services/        # Lógica de negócio
+│   ├── utils/           # Utilitários
+│   ├── reports/         # Relatórios gerados
+│   └── main.py          # App principal
+│
+├── front/               # Frontend React
+│   ├── src/
+│   │   ├── components/  # Componentes UI
+│   │   ├── services/    # Serviços HTTP
+│   │   ├── config/      # Configurações
+│   │   └── pages/       # Páginas
+│   └── public/          # Arquivos estáticos
+│
+└── docs/                # Documentação
+    └── ARCHITECTURE.md  # Arquitetura detalhada
 ```
+
+## 📚 Documentação
+
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Arquitetura completa do sistema
+- **[Backend README](backend/README.md)** - Documentação específica do backend
+- **[Frontend README](front/README.md)** - Documentação específica do frontend
+- **[Swagger UI](http://localhost:5000/docs)** - Documentação interativa da API
+
+## 🔌 Endpoints da API
+
+### POST /api/analyze/image
+Upload de imagem (multipart/form-data) para análise.
+
+### POST /api/analyze/mermaid
+Análise de código Mermaid (JSON).
+
+### GET /api/report/download/{filename}
+Download de relatório gerado (.md ou .pdf).
+
+## 🛠️ Tecnologias
+
+### Backend
+- **FastAPI** - Framework web moderno
+- **OpenAI GPT-5.2** - Análise avançada de imagens com visão
+- **OpenAI GPT-5** - Raciocínio inteligente para texto e código
+- **Pydantic** - Validação de dados
+- **WeasyPrint** - Geração de PDFs
+- **Uvicorn** - Servidor ASGI
+
+### Frontend
+- **React 18** - Biblioteca UI
+- **TypeScript** - Tipagem estática
+- **Vite** - Build tool
+- **Tailwind CSS** - Framework CSS
+- **Shadcn/ui** - Componentes UI
+- **Mermaid** - Renderização de diagramas
+
+## 🧪 Testes
+
+### Backend
+```bash
+cd backend
+pytest
+```
+
+### Frontend
+```bash
+cd front
+npm run test
+# ou
+bun test
+```
+
+## 🐛 Troubleshooting
+
+### Backend não conecta ao OpenAI
+- Verifique se a chave `OPENAI_API_KEY` está correta no `.env`
+- Verifique se tem créditos disponíveis na conta OpenAI
+- Teste a chave: `curl https://api.openai.com/v1/models -H "Authorization: Bearer $OPENAI_API_KEY"`
+
+### Frontend não conecta ao Backend
+- Verifique se o backend está rodando em `http://localhost:5000`
+- Verifique o console do navegador para erros de CORS
+- Confirme que o `CORS_ORIGINS` no backend inclui `http://localhost:5173`
+
+### Relatórios não são gerados
+- Verifique se a pasta `backend/reports/` existe e tem permissões de escrita
+- Consulte os logs do backend para mensagens de erro
+
+## 📝 Licença
+
+MIT License - veja [LICENSE](backend/LICENSE) para detalhes.
+
+## 👥 Contribuindo
+
+Contribuições são bem-vindas! Por favor:
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📧 Contato
+
+Para dúvidas ou suporte, abra uma issue no GitHub.
+
+---
+
+**Desenvolvido com ❤️ usando IA e boas práticas de segurança**
