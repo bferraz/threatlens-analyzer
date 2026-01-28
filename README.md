@@ -106,12 +106,19 @@ sequenceDiagram
     participant M as 🗄️ MongoDB
 
     Note over U,M: 1️⃣ Upload & Análise Inicial
-    U->>F: Upload diagrama<br/>ou código Mermaid
-    F->>F: Validação local<br/>(tamanho, formato)
-    F->>B: POST /api/analyze/image<br/>ou /api/analyze/mermaid
-    
-    Note over B: Validação de entrada
-    B->>O: Enviar diagrama +<br/>prompt STRIDE
+
+    alt Opção 1: Upload de Imagem
+        U->>F: Upload imagem<br/>(PNG/JPG/JPEG)
+        F->>F: Validação:<br/>- Tamanho < 10MB<br/>- Formato de imagem
+        F->>B: POST /api/analyze/image<br/>multipart/form-data
+        B->>B: Converte para Base64
+        B->>O: GPT-5.2 Vision API<br/>Imagem Base64 + Prompt STRIDE
+    else Opção 2: Código Mermaid
+        U->>F: Cola código Mermaid<br/>(texto)
+        F->>F: Validação:<br/>- Sintaxe Mermaid<br/>- Preview renderizado
+        F->>B: POST /api/analyze/mermaid<br/>application/json
+        B->>O: GPT-5.2 Text API<br/>Código Mermaid + Prompt STRIDE
+    end
     
     Note over O: GPT-5.2 analisa:<br/>- Componentes<br/>- Data Flows<br/>- Trust Zones<br/>- Ameaças STRIDE<br/>- Mitigações
     
