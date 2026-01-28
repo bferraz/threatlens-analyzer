@@ -8,3 +8,6 @@ python-multipart
 weasyprint
 markdown
 aiofiles
+motor
+beanie
+pymongo

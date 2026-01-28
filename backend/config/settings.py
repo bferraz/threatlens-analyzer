@@ -18,8 +18,12 @@ class Settings(BaseSettings):
     api_port: int = 5000
     debug: bool = True
     
+    # MongoDB Configuration
+    mongodb_url: str = "mongodb://localhost:27017"
+    mongodb_db_name: str = "threatlens"
+    
     # CORS Configuration
-    cors_origins: List[str] = ["http://localhost:5173", "http://localhost:5173/"]
+    cors_origins: List[str] = ["http://localhost:5173", "http://localhost:5173/", "http://localhost:8081", "http://localhost:8081/"]
     
     # Request Limits
     max_image_size_mb: int = 10
