@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { ExampleDiagram } from "@/components/ExampleDiagram";
@@ -23,6 +23,7 @@ const Index = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [mermaidText, setMermaidText] = useState("");
   const [analysisName, setAnalysisName] = useState("");
+  const [nameError, setNameError] = useState<string | null>(null);
 
   // Settings state
   const [settings, setSettings] = useState<AnalysisSettings>({
@@ -43,7 +44,42 @@ const Index = () => {
 
   const isInputValid =
     analysisName.trim().length > 0 &&
+    !nameError &&
     (inputType === "image" ? !!imageFile : mermaidText.trim().length > 0);
+
+  // Check for duplicate name
+  const checkDuplicateName = async (name: string) => {
+    if (!name.trim()) {
+      setNameError(null);
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/analyses/check-name?name=${encodeURIComponent(name.trim())}`
+      );
+      const data = await response.json();
+      if (data.exists) {
+        setNameError("An analysis with this name already exists");
+      } else {
+        setNameError(null);
+      }
+    } catch (error) {
+      console.error("Error checking name:", error);
+      setNameError(null);
+    }
+  };
+
+  // Debounce name check
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (analysisName.trim()) {
+        checkDuplicateName(analysisName);
+      } else {
+        setNameError(null);
+      }
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [analysisName]);
 
   const handleAnalyze = async () => {
     if (!isInputValid) return;
@@ -51,6 +87,7 @@ const Index = () => {
     setIsAnalyzing(true);
     setStatusMessage("Preparing analysis...");
     setResult(null);
+    setNameError(null);
 
     try {
       setStatusMessage("Analyzing diagram structure...");
@@ -80,10 +117,10 @@ const Index = () => {
 
       // Save analysis to database
       try {
-        setStatusMessage("Salvando análise...");
+        setStatusMessage("Saving analysis...");
         await RealAnalysesService.saveAnalysis({
           name: analysisName,
-          description: `Análise gerada em ${new Date().toLocaleString("pt-BR")}`,
+          description: `Analysis generated on ${new Date().toLocaleString("en-US")}`,
           diagramType: inputType,
           diagramContent: inputType === "mermaid" ? mermaidText : undefined,
           analysisResult,
@@ -91,14 +128,14 @@ const Index = () => {
         });
 
         toast({
-          title: "Análise Concluída e Salva",
-          description: `Encontradas ${analysisResult.threats.length} ameaças em ${analysisResult.components.length} componentes`,
+          title: "Analysis Complete and Saved",
+          description: `Found ${analysisResult.threats.length} threats across ${analysisResult.components.length} components`,
         });
       } catch (saveError) {
         console.error("Error saving analysis:", saveError);
         toast({
-          title: "Análise Concluída (Não Salva)",
-          description: `Encontradas ${analysisResult.threats.length} ameaças. Erro ao salvar no banco de dados.`,
+          title: "Analysis Complete (Not Saved)",
+          description: `Found ${analysisResult.threats.length} threats. Failed to save to database.`,
           variant: "destructive",
         });
       }
@@ -114,8 +151,8 @@ const Index = () => {
     } catch (error) {
       setStatusMessage(null);
       toast({
-        title: "Análise Falhou",
-        description: error instanceof Error ? error.message : "Ocorreu um erro",
+        title: "Analysis Failed",
+        description: error instanceof Error ? error.message : "An error occurred",
         variant: "destructive",
       });
     } finally {
@@ -128,6 +165,7 @@ const Index = () => {
     setImageFile(null);
     setMermaidText("");
     setAnalysisName("");
+    setNameError(null);
     scrollToAnalyzer();
   };
 
@@ -148,10 +186,10 @@ const Index = () => {
           <div className="container">
             <div className="mb-10 text-center">
               <h2 className="mb-3 text-2xl font-bold tracking-tight sm:text-3xl">
-                Analise Sua Arquitetura
+                Analyze Your Architecture
               </h2>
               <p className="text-muted-foreground">
-                Envie uma imagem de diagrama ou cole código Mermaid para começar
+                Upload a diagram image or paste Mermaid code to get started
               </p>
             </div>
 
@@ -163,27 +201,34 @@ const Index = () => {
                     <CardHeader className="pb-4">
                       <CardTitle className="flex items-center gap-2 text-lg">
                         <FileText className="h-5 w-5 text-accent" />
-                        Nome da Análise
+                        Analysis Name
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
                         <Label htmlFor="analysis-name">
-                          Como você quer chamar esta análise?{" "}
+                          What would you like to call this analysis?{" "}
                           <span className="text-red-500">*</span>
                         </Label>
                         <Input
                           id="analysis-name"
                           type="text"
-                          placeholder="Ex: Análise de Segurança - E-commerce Platform"
+                          placeholder="E.g.: Security Analysis - E-commerce Platform"
                           value={analysisName}
                           onChange={(e) => setAnalysisName(e.target.value)}
-                          className="w-full"
+                          className={`w-full ${nameError ? "border-red-500" : ""}`}
                         />
-                        <p className="text-xs text-muted-foreground">
-                          Este nome será usado para identificar e organizar suas
-                          análises no histórico.
-                        </p>
+                        {nameError ? (
+                          <p className="text-xs text-red-500 flex items-center gap-1">
+                            <AlertCircle className="h-3 w-3" />
+                            {nameError}
+                          </p>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">
+                            This name will be used to identify and organize your
+                            analyses in history.
+                          </p>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -219,12 +264,14 @@ const Index = () => {
                   )}
 
                   {/* Validation hint */}
-                  {!isInputValid && !isAnalyzing && (
+                  {!isInputValid && !isAnalyzing && !nameError && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <AlertCircle className="h-4 w-4" />
-                      {inputType === "image"
-                        ? "Envie uma imagem do diagrama para continuar"
-                        : "Digite o código Mermaid para continuar"}
+                      {!analysisName.trim()
+                        ? "Enter an analysis name to continue"
+                        : inputType === "image"
+                          ? "Upload a diagram image to continue"
+                          : "Enter Mermaid code to continue"}
                     </div>
                   )}
                 </div>
@@ -249,7 +296,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border/50 py-8">
         <div className="container text-center text-sm text-muted-foreground">
-          <p>ThreatLens — Modelagem de Ameaças STRIDE com IA</p>
+          <p>ThreatLens — AI-Powered STRIDE Threat Modeling</p>
         </div>
       </footer>
     </div>

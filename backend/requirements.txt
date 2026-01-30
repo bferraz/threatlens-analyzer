@@ -5,7 +5,7 @@ pydantic-settings
 openai
 python-dotenv
 python-multipart
-weasyprint
+xhtml2pdf
 markdown
 aiofiles
 motor

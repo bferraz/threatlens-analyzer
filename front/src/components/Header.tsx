@@ -30,17 +30,17 @@ export function Header({ onAnalyzeClick }: HeaderProps) {
           <Button variant="ghost" asChild>
             <Link to="/history">
               <HistoryIcon className="h-4 w-4 mr-2" />
-              Histórico
+              History
             </Link>
           </Button>
           <ThemeToggle />
           {isHomePage && onAnalyzeClick ? (
             <Button onClick={onAnalyzeClick} className="hidden sm:flex">
-              Analisar Diagrama
+              Analyze Diagram
             </Button>
           ) : (
             <Button asChild className="hidden sm:flex">
-              <Link to="/">Analisar Diagrama</Link>
+              <Link to="/">Analyze Diagram</Link>
             </Button>
           )}
         </div>

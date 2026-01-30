@@ -67,7 +67,7 @@ export function ThreatsCardWithChecks({
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <ShieldAlert className="h-5 w-5 text-accent" />
-          Modelo de Ameaças (STRIDE)
+          Threat Model (STRIDE)
           <Badge variant="secondary" className="ml-auto">
             {threats.length}
           </Badge>
@@ -88,7 +88,7 @@ export function ThreatsCardWithChecks({
                       {getComponentName(componentId)}
                     </span>
                     <Badge variant="outline" className="text-xs">
-                      {componentThreats.length} ameaças
+                      {componentThreats.length} threats
                     </Badge>
                   </div>
                 </AccordionTrigger>

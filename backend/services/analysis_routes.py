@@ -56,6 +56,14 @@ async def create_analysis(request: SaveAnalysisRequest):
     Create a new saved analysis
     """
     try:
+        # Check if analysis with same name already exists
+        existing = await SavedAnalysisDocument.find_one({"name": request.name})
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"An analysis with the name '{request.name}' already exists"
+            )
+        
         # Create new document
         analysis = SavedAnalysisDocument(
             name=request.name,
@@ -78,11 +86,29 @@ async def create_analysis(request: SaveAnalysisRequest):
             "message": "Analysis saved successfully"
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error creating analysis: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to save analysis: {str(e)}"
+        )
+
+
+@router.get("/check-name")
+async def check_name_exists(name: str):
+    """
+    Check if an analysis with the given name already exists
+    """
+    try:
+        existing = await SavedAnalysisDocument.find_one({"name": name})
+        return {"exists": existing is not None, "name": name}
+    except Exception as e:
+        logger.error(f"Error checking name: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to check name: {str(e)}"
         )
 
 

@@ -5,7 +5,7 @@
 // Base request types
 export type InputType = "image" | "mermaid";
 export type AnalysisDepth = "quick" | "full";
-export type ReportFormat = "markdown"; // PDF disabled - requires GTK+ dependencies
+export type ReportFormat = "markdown" | "pdf";
 
 // Request payload types
 interface BaseAnalysisRequestPayload {
