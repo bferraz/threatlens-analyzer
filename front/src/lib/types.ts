@@ -64,3 +64,50 @@ export const STRIDE_COLORS: Record<StrideCategory, string> = {
   D: "stride-d",
   E: "stride-e",
 };
+
+// Types for saved analyses and checks
+export interface ThreatCheck {
+  threatId: string;
+  isResolved: boolean;
+  resolvedAt?: string;
+  notes?: string;
+}
+
+export interface MitigationCheck {
+  mitigationId: string;
+  stepIndex?: number; // Optional for individual step tracking
+  isCompleted: boolean;
+  completedAt?: string;
+  notes?: string;
+}
+
+export interface SavedAnalysis {
+  id: string;
+  name: string;
+  description?: string;
+  diagramType: "image" | "mermaid";
+  diagramData?: string; // base64 for image or mermaid code
+  analysisResult: AnalysisResult;
+  threatChecks: ThreatCheck[];
+  mitigationChecks: MitigationCheck[];
+  createdAt: string;
+  updatedAt: string;
+  tags?: string[];
+}
+
+export interface AnalysisSummary {
+  id: string;
+  name: string;
+  description?: string;
+  diagramType: "image" | "mermaid";
+  createdAt: string;
+  updatedAt: string;
+  tags?: string[];
+  stats: {
+    totalThreats: number;
+    resolvedThreats: number;
+    criticalThreats: number;
+    totalMitigations: number;
+    completedMitigations: number;
+  };
+}

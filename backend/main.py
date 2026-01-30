@@ -7,10 +7,12 @@ import uvicorn
 import base64
 
 from config.settings import settings
+from config.database import Database
 from models.simple_request_models import MermaidAnalysisRequest
 from models.response_models import AnalysisResponse, ErrorResponse
 from services.analyzer import stride_analyzer
 from services.report_generator import report_generator
+from services.analysis_routes import router as analysis_router
 from utils.validators import validate_mermaid_code
 
 
@@ -22,6 +24,14 @@ async def lifespan(app: FastAPI):
     print(f"📊 OpenAI Models: Vision={settings.openai_vision_model}, Text={settings.openai_text_model}")
     print(f"🎯 Max Tokens: {settings.openai_max_tokens}")
     
+    # Connect to MongoDB
+    try:
+        await Database.connect_db(settings)
+        print(f"✅ Connected to MongoDB: {settings.mongodb_url}")
+    except Exception as e:
+        print(f"❌ Failed to connect to MongoDB: {e}")
+        print("⚠️  API will run without database features")
+    
     # Create reports directory if it doesn't exist
     Path(settings.reports_dir).mkdir(exist_ok=True)
     
@@ -29,6 +39,8 @@ async def lifespan(app: FastAPI):
     
     # Shutdown
     print("👋 Shutting down ThreatLens Analyzer API...")
+    await Database.close_db()
+    print("✅ MongoDB connection closed")
 
 
 # Create FastAPI application
@@ -105,6 +117,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include routers
+app.include_router(analysis_router)
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
@@ -297,6 +311,78 @@ async def analyze_mermaid(request: MermaidAnalysisRequest):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Analysis failed: {str(e)}"
+        )
+
+
+@app.get(
+    "/api/analyses/{analysis_id}/report",
+    tags=["Saved Analyses"],
+    summary="📥 Download do Relatório de uma Análise Salva",
+    description="Gera e baixa o relatório Markdown de uma análise salva.",
+    response_class=FileResponse
+)
+async def download_saved_analysis_report(analysis_id: str):
+    """
+    Download report for a saved analysis.
+    
+    Generates a Markdown report from the saved analysis data and returns it for download.
+    """
+    try:
+        # Get the saved analysis
+        analysis_doc = await SavedAnalysisDocument.get(analysis_id)
+        
+        if not analysis_doc:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Analysis not found"
+            )
+        
+        # Create AnalysisResponse from saved data for report generation
+        from models.response_models import AnalysisResponse, Component, DataFlow, Threat, Mitigation
+        
+        analysis_response = AnalysisResponse(
+            components=[
+                Component(**comp.dict()) 
+                for comp in analysis_doc.analysisResult.components
+            ],
+            data_flows=[
+                DataFlow(**flow.dict()) 
+                for flow in analysis_doc.analysisResult.data_flows
+            ],
+            threats=[
+                Threat(**threat.dict()) 
+                for threat in analysis_doc.analysisResult.threats
+            ],
+            mitigations=[
+                Mitigation(**mit.dict()) 
+                for mit in analysis_doc.analysisResult.mitigations
+            ],
+            assumptions=analysis_doc.analysisResult.assumptions,
+            uncertainties=analysis_doc.analysisResult.uncertainties,
+            reportDownloadUrl=f"/api/analyses/{analysis_id}/report"
+        )
+        
+        # Generate report
+        report_path = await report_generator.generate_report(
+            analysis_response,
+            format="markdown"
+        )
+        
+        # Return file
+        filename = f"{analysis_doc.name.replace(' ', '_')}_report.md"
+        
+        return FileResponse(
+            path=report_path,
+            media_type="text/markdown",
+            filename=filename
+        )
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate report: {str(e)}"
         )
 
 
