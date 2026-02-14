@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { RealAnalysesService } from "@/services/real-analyses.service";
 import { SavedAnalysis, Threat, Mitigation } from "@/lib/types";
 import { Header } from "@/components/Header";
@@ -20,6 +20,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -36,6 +46,7 @@ import {
   FileCode,
   ListChecks,
   Download,
+  Trash2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
@@ -45,10 +56,13 @@ import { toast } from "@/hooks/use-toast";
 
 export default function AnalysisDetails() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [analysis, setAnalysis] = useState<SavedAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [savingCheck, setSavingCheck] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -258,6 +272,35 @@ export default function AnalysisDetails() {
     }
   };
 
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!analysis) return;
+
+    try {
+      setIsDeleting(true);
+      await RealAnalysesService.deleteAnalysis(analysis.id);
+      
+      toast({
+        title: "Analysis Deleted",
+        description: "The analysis has been permanently deleted.",
+      });
+      
+      // Navigate back to history
+      navigate("/history");
+    } catch (error) {
+      toast({
+        title: "Delete Failed",
+        description: error instanceof Error ? error.message : "Could not delete analysis",
+        variant: "destructive",
+      });
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+    }
+  };
+
   if (loading) {
     return (
       <>
@@ -383,15 +426,27 @@ export default function AnalysisDetails() {
                 </div>
               </div>
 
-              {/* Action Button */}
-              <Button 
-                onClick={handleDownloadReport}
-                disabled={isDownloading}
-                className="gap-2"
-              >
-                <Download className="h-4 w-4" />
-                {isDownloading ? "Downloading..." : "Download Report"}
-              </Button>
+              {/* Action Buttons */}
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleDownloadReport}
+                  disabled={isDownloading}
+                  className="gap-2"
+                  variant="default"
+                >
+                  <Download className="h-4 w-4" />
+                  {isDownloading ? "Downloading..." : "Download Report"}
+                </Button>
+                <Button
+                  onClick={handleDeleteClick}
+                  disabled={isDeleting}
+                  variant="destructive"
+                  className="gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -479,6 +534,30 @@ export default function AnalysisDetails() {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Analysis</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{analysis?.name}"?
+              This action cannot be undone and will permanently remove the analysis
+              and all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

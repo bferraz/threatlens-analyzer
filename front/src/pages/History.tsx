@@ -15,6 +15,16 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   AlertCircle,
   CheckCircle2,
   Clock,
@@ -26,6 +36,7 @@ import {
   AlertTriangle,
   Calendar,
   Tag,
+  Trash2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
@@ -34,6 +45,9 @@ export default function History() {
   const [analyses, setAnalyses] = useState<AnalysisSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [analysisToDelete, setAnalysisToDelete] = useState<AnalysisSummary | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     loadAnalyses();
@@ -66,6 +80,31 @@ export default function History() {
 
   const getProgressPercentage = (completed: number, total: number) => {
     return total > 0 ? Math.round((completed / total) * 100) : 0;
+  };
+
+  const handleDeleteClick = (analysis: AnalysisSummary) => {
+    setAnalysisToDelete(analysis);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!analysisToDelete) return;
+
+    try {
+      setIsDeleting(true);
+      await RealAnalysesService.deleteAnalysis(analysisToDelete.id);
+      
+      // Remove from local state
+      setAnalyses(prev => prev.filter(a => a.id !== analysisToDelete.id));
+      
+      setDeleteDialogOpen(false);
+      setAnalysisToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete analysis:", error);
+      alert("Failed to delete analysis. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -246,11 +285,24 @@ export default function History() {
                             </CardDescription>
                           )}
                         </div>
-                        <Button asChild variant="default">
-                          <Link to={`/history/${analysis.id}`}>
-                            View Details
-                          </Link>
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button asChild variant="default">
+                            <Link to={`/history/${analysis.id}`}>
+                              View Details
+                            </Link>
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleDeleteClick(analysis);
+                            }}
+                            title="Delete analysis"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
 
                       {/* Tags */}
@@ -385,6 +437,30 @@ export default function History() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Analysis</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{analysisToDelete?.name}"?
+              This action cannot be undone and will permanently remove the analysis
+              and all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
