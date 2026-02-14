@@ -150,14 +150,14 @@ export function SummaryPanel({ result, showAssumptions }: SummaryPanelProps) {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <HelpCircle className="h-5 w-5 text-accent" />
-                Observações
+                Observations
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {result.assumptions.length > 0 && (
                 <div>
                   <p className="mb-2 text-sm font-medium text-muted-foreground">
-                    Suposições
+                    Assumptions
                   </p>
                   <ul className="space-y-1.5">
                     {result.assumptions.map((item, index) => (
@@ -171,7 +171,7 @@ export function SummaryPanel({ result, showAssumptions }: SummaryPanelProps) {
               {result.uncertainties.length > 0 && (
                 <div>
                   <p className="mb-2 text-sm font-medium text-muted-foreground">
-                    Incertezas
+                    Uncertainties
                   </p>
                   <ul className="space-y-1.5">
                     {result.uncertainties.map((item, index) => (

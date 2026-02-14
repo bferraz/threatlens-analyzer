@@ -69,7 +69,7 @@ export function DiagramInput({
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-lg">
           <FileCode className="h-5 w-5 text-accent" />
-          Entrada de Diagrama
+          Diagram Input
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -80,7 +80,7 @@ export function DiagramInput({
           <TabsList className="mb-4 grid w-full grid-cols-2">
             <TabsTrigger value="image" className="gap-2">
               <ImageIcon className="h-4 w-4" />
-              Upload de Imagem
+              Image Upload
             </TabsTrigger>
             <TabsTrigger value="mermaid" className="gap-2">
               <FileCode className="h-4 w-4" />
@@ -122,10 +122,10 @@ export function DiagramInput({
               >
                 <Upload className="mb-3 h-10 w-10 text-muted-foreground" />
                 <p className="mb-1 text-sm font-medium">
-                  Arraste e solte seu diagrama de arquitetura
+                  Drag and drop your architecture diagram
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  PNG, JPG, SVG até 10MB
+                  PNG, JPG, SVG up to 10MB
                 </p>
                 <input
                   id="file-upload"
@@ -142,25 +142,25 @@ export function DiagramInput({
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">Código Mermaid</label>
+                  <label className="text-sm font-medium">Mermaid Code</label>
                   <Button
                     variant="ghost"
                     size="sm"
                     className="h-7 text-xs"
                     onClick={() => onMermaidChange(exampleMermaid)}
                   >
-                    Carregar Exemplo
+                    Load Example
                   </Button>
                 </div>
                 <Textarea
-                  placeholder="Digite o código do seu diagrama Mermaid..."
+                  placeholder="Enter your Mermaid diagram code..."
                   className="min-h-[200px] resize-none font-mono text-sm"
                   value={mermaidText}
                   onChange={(e) => onMermaidChange(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Prévia</label>
+                <label className="text-sm font-medium">Preview</label>
                 <MermaidPreview code={mermaidText} className="min-h-[200px]" />
               </div>
             </div>

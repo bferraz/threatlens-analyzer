@@ -22,12 +22,12 @@ export function AnalyzeButton({
       {isLoading ? (
         <>
           <Loader2 className="h-5 w-5 animate-spin" />
-          Analisando...
+          Analyzing...
         </>
       ) : (
         <>
           <Zap className="h-5 w-5" />
-          Analisar Arquitetura
+          Analyze Architecture
         </>
       )}
     </Button>

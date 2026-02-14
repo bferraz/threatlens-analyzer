@@ -35,7 +35,7 @@ export function ComponentsCard({ components }: ComponentsCardProps) {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Box className="h-5 w-5 text-accent" />
-          Componentes Identificados
+          Identified Components
           <Badge variant="secondary" className="ml-auto">
             {components.length}
           </Badge>

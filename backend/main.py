@@ -71,7 +71,7 @@ API REST para análise automatizada de ameaças STRIDE em diagramas de arquitetu
 ### Tecnologias
 
 * FastAPI 0.109.0
-* OpenAI GPT-4 Vision & GPT-4
+* OpenAI GPT-5.2 Vision & GPT-5
 * WeasyPrint para geração de PDFs
 * Pydantic para validação
 

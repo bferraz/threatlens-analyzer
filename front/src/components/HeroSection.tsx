@@ -10,17 +10,17 @@ export function HeroSection({ onAnalyzeClick }: HeroSectionProps) {
     {
       icon: Upload,
       title: "Upload",
-      description: "Adicione seu diagrama de arquitetura ou código Mermaid",
+      description: "Add your architecture diagram or Mermaid code",
     },
     {
       icon: Cpu,
-      title: "Extração",
-      description: "IA identifica componentes e fluxos de dados",
+      title: "Extraction",
+      description: "AI identifies components and data flows",
     },
     {
       icon: ShieldCheck,
-      title: "STRIDE + Mitigações",
-      description: "Obtenha análise abrangente de ameaças",
+      title: "STRIDE + Mitigations",
+      description: "Get comprehensive threat analysis",
     },
   ];
 
@@ -36,18 +36,18 @@ export function HeroSection({ onAnalyzeClick }: HeroSectionProps) {
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-4 py-1.5 text-sm font-medium text-accent">
             <ShieldCheck className="h-4 w-4" />
-            Análise de Segurança com IA
+            AI-Powered Security Analysis
           </div>
 
           <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            Gere{" "}
-            <span className="gradient-text">modelos de ameaças STRIDE</span> a
-            partir de diagramas de arquitetura
+            Generate{" "}
+            <span className="gradient-text">STRIDE threat models</span> from
+            architecture diagrams
           </h1>
 
           <p className="mb-10 text-lg text-muted-foreground sm:text-xl">
-            Envie a arquitetura do seu sistema e obtenha análise abrangente de
-            ameaças com mitigações acionáveis em segundos.
+            Upload your system architecture and get comprehensive threat
+            analysis with actionable mitigations in seconds.
           </p>
 
           <Button
@@ -55,7 +55,7 @@ export function HeroSection({ onAnalyzeClick }: HeroSectionProps) {
             onClick={onAnalyzeClick}
             className="group gap-2 text-base"
           >
-            Analisar Diagrama
+            Analyze Diagram
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Button>
         </div>

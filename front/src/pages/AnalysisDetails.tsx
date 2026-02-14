@@ -35,16 +35,20 @@ import {
   FileImage,
   FileCode,
   ListChecks,
+  Download,
 } from "lucide-react";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import { STRIDE_LABELS } from "@/lib/types";
+import { downloadReport } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
 
 export default function AnalysisDetails() {
   const { id } = useParams<{ id: string }>();
   const [analysis, setAnalysis] = useState<SavedAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [savingCheck, setSavingCheck] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -212,9 +216,46 @@ export default function AnalysisDetails() {
   };
 
   const formatDate = (dateString: string) => {
-    return format(new Date(dateString), "dd 'de' MMM, yyyy 'às' HH:mm", {
-      locale: ptBR,
+    return format(new Date(dateString), "MMM dd, yyyy 'at' HH:mm", {
+      locale: enUS,
     });
+  };
+
+  const handleDownloadReport = async () => {
+    if (!analysis) return;
+
+    try {
+      setIsDownloading(true);
+      const blob = await downloadReport(analysis.analysisResult.reportDownloadUrl);
+      
+      // Determine file extension from URL or default to .md
+      const urlLower = analysis.analysisResult.reportDownloadUrl.toLowerCase();
+      const isPdf = urlLower.includes('.pdf');
+      const extension = isPdf ? 'pdf' : 'md';
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${analysis.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Download Started",
+        description: `${extension.toUpperCase()} report downloaded successfully`,
+      });
+    } catch (error) {
+      toast({
+        title: "Download Failed",
+        description: error instanceof Error ? error.message : "Could not download report",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   if (loading) {
@@ -244,10 +285,10 @@ export default function AnalysisDetails() {
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <AlertTriangle className="h-12 w-12 text-red-500 mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
-                  Análise não encontrada
+                  Analysis not found
                 </h3>
                 <Button asChild className="mt-4">
-                  <Link to="/history">Voltar ao Histórico</Link>
+                  <Link to="/history">Back to History</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -291,7 +332,7 @@ export default function AnalysisDetails() {
             <Button variant="ghost" asChild className="mb-4">
               <Link to="/history">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar ao Histórico
+                Back to History
               </Link>
             </Button>
 
@@ -333,14 +374,24 @@ export default function AnalysisDetails() {
                 <div className="flex items-center gap-6 mt-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    <span>Criado: {formatDate(analysis.createdAt)}</span>
+                    <span>Created: {formatDate(analysis.createdAt)}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    <span>Atualizado: {formatDate(analysis.updatedAt)}</span>
+                    <span>Updated: {formatDate(analysis.updatedAt)}</span>
                   </div>
                 </div>
               </div>
+
+              {/* Action Button */}
+              <Button 
+                onClick={handleDownloadReport}
+                disabled={isDownloading}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {isDownloading ? "Downloading..." : "Download Report"}
+              </Button>
             </div>
           </div>
 
@@ -350,15 +401,15 @@ export default function AnalysisDetails() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-orange-500" />
-                  Progresso de Ameaças
+                  Threat Progress
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span>
-                      {resolvedThreatsCount} de{" "}
-                      {analysis.analysisResult.threats.length} resolvidas
+                      {resolvedThreatsCount} of{" "}
+                      {analysis.analysisResult.threats.length} resolved
                     </span>
                     <span className="font-medium">{threatProgress}%</span>
                   </div>
@@ -376,15 +427,15 @@ export default function AnalysisDetails() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ListChecks className="h-5 w-5 text-blue-500" />
-                  Progresso de Mitigações
+                  Mitigation Progress
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span>
-                      {completedMitigationsCount} de {totalMitigationSteps}{" "}
-                      concluídas
+                      {completedMitigationsCount} of {totalMitigationSteps}{" "}
+                      completed
                     </span>
                     <span className="font-medium">{mitigationProgress}%</span>
                   </div>

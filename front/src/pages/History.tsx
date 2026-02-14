@@ -28,7 +28,7 @@ import {
   Tag,
 } from "lucide-react";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 
 export default function History() {
   const [analyses, setAnalyses] = useState<AnalysisSummary[]>([]);
@@ -61,7 +61,7 @@ export default function History() {
   });
 
   const formatDate = (dateString: string) => {
-    return format(new Date(dateString), "dd 'de' MMM, yyyy", { locale: ptBR });
+    return format(new Date(dateString), "MMM dd, yyyy", { locale: enUS });
   };
 
   const getProgressPercentage = (completed: number, total: number) => {
@@ -78,11 +78,11 @@ export default function History() {
             <div className="flex items-center gap-3 mb-2">
               <Shield className="h-8 w-8 text-primary" />
               <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
-                Histórico de Análises
+                Analysis History
               </h1>
             </div>
             <p className="text-muted-foreground text-lg">
-              Gerencie e acompanhe suas análises de segurança
+              Manage and track your security analyses
             </p>
           </div>
 
@@ -92,7 +92,7 @@ export default function History() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Buscar por nome, descrição ou tags..."
+                placeholder="Search by name, description or tags..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 h-12 text-base"
@@ -106,7 +106,7 @@ export default function History() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">
-                        Total de Análises
+                        Total Analyses
                       </p>
                       <p className="text-3xl font-bold">{analyses.length}</p>
                     </div>
@@ -120,7 +120,7 @@ export default function History() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">
-                        Ameaças Totais
+                        Total Threats
                       </p>
                       <p className="text-3xl font-bold">
                         {analyses.reduce(
@@ -139,7 +139,7 @@ export default function History() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">
-                        Ameaças Resolvidas
+                        Resolved Threats
                       </p>
                       <p className="text-3xl font-bold">
                         {analyses.reduce(
@@ -158,7 +158,7 @@ export default function History() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">
-                        Críticas Abertas
+                        Critical Open
                       </p>
                       <p className="text-3xl font-bold">
                         {analyses.reduce(
@@ -195,17 +195,17 @@ export default function History() {
                 <Shield className="h-12 w-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
                   {searchQuery
-                    ? "Nenhuma análise encontrada"
-                    : "Nenhuma análise salva"}
+                    ? "No analyses found"
+                    : "No saved analyses"}
                 </h3>
                 <p className="text-muted-foreground text-center mb-4">
                   {searchQuery
-                    ? "Tente ajustar sua busca"
-                    : "Comece criando sua primeira análise de segurança"}
+                    ? "Try adjusting your search"
+                    : "Start by creating your first security analysis"}
                 </p>
                 {!searchQuery && (
                   <Button asChild>
-                    <Link to="/">Nova Análise</Link>
+                    <Link to="/">New Analysis</Link>
                   </Button>
                 )}
               </CardContent>
@@ -248,7 +248,7 @@ export default function History() {
                         </div>
                         <Button asChild variant="default">
                           <Link to={`/history/${analysis.id}`}>
-                            Ver Detalhes
+                            View Details
                           </Link>
                         </Button>
                       </div>
@@ -277,7 +277,7 @@ export default function History() {
                           <AlertTriangle className="h-4 w-4 text-orange-500" />
                           <div>
                             <p className="text-xs text-muted-foreground">
-                              Ameaças
+                              Threats
                             </p>
                             <p className="font-semibold">
                               {analysis.stats.totalThreats}
@@ -289,7 +289,7 @@ export default function History() {
                           <CheckCircle2 className="h-4 w-4 text-green-500" />
                           <div>
                             <p className="text-xs text-muted-foreground">
-                              Resolvidas
+                              Resolved
                             </p>
                             <p className="font-semibold">
                               {analysis.stats.resolvedThreats}
@@ -301,7 +301,7 @@ export default function History() {
                           <AlertCircle className="h-4 w-4 text-red-500" />
                           <div>
                             <p className="text-xs text-muted-foreground">
-                              Críticas
+                              Critical
                             </p>
                             <p className="font-semibold">
                               {analysis.stats.criticalThreats}
@@ -313,7 +313,7 @@ export default function History() {
                           <TrendingUp className="h-4 w-4 text-blue-500" />
                           <div>
                             <p className="text-xs text-muted-foreground">
-                              Mitigações
+                              Mitigations
                             </p>
                             <p className="font-semibold">
                               {analysis.stats.completedMitigations}/
@@ -328,7 +328,7 @@ export default function History() {
                         <div>
                           <div className="flex justify-between text-sm mb-1">
                             <span className="text-muted-foreground">
-                              Progresso de Ameaças
+                              Threat Progress
                             </span>
                             <span className="font-medium">
                               {threatProgress}%
@@ -345,7 +345,7 @@ export default function History() {
                         <div>
                           <div className="flex justify-between text-sm mb-1">
                             <span className="text-muted-foreground">
-                              Progresso de Mitigações
+                              Mitigation Progress
                             </span>
                             <span className="font-medium">
                               {mitigationProgress}%
@@ -366,13 +366,13 @@ export default function History() {
                           <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
                             <span>
-                              Criado: {formatDate(analysis.createdAt)}
+                              Created: {formatDate(analysis.createdAt)}
                             </span>
                           </div>
                           <div className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
                             <span>
-                              Atualizado: {formatDate(analysis.updatedAt)}
+                              Updated: {formatDate(analysis.updatedAt)}
                             </span>
                           </div>
                         </div>

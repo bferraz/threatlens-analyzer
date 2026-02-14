@@ -59,7 +59,7 @@ class OpenAIService:
         include_assumptions: bool = True
     ) -> Dict[str, Any]:
         """
-        Analyze an architecture diagram image using GPT-4 Vision.
+        Analyze an architecture diagram image using GPT-5.2 Vision.
         
         Args:
             image_base64: Base64 encoded image data
@@ -146,7 +146,7 @@ class OpenAIService:
         include_assumptions: bool = True
     ) -> Dict[str, Any]:
         """
-        Analyze Mermaid diagram code using GPT-4.
+        Analyze Mermaid diagram code using GPT-5.2.
         
         Args:
             mermaid_code: Mermaid diagram code

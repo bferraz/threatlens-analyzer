@@ -27,12 +27,12 @@ export function SettingsPanel({
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Settings className="h-5 w-5 text-accent" />
-          Configurações de Análise
+          Analysis Settings
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="depth">Profundidade da Análise</Label>
+          <Label htmlFor="depth">Analysis Depth</Label>
           <Select
             value={settings.analysisDepth}
             onValueChange={(v) =>
@@ -46,14 +46,14 @@ export function SettingsPanel({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="quick">Rápida (Mais veloz)</SelectItem>
-              <SelectItem value="full">Completa (Abrangente)</SelectItem>
+              <SelectItem value="quick">Quick (Faster)</SelectItem>
+              <SelectItem value="full">Full (Comprehensive)</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="format">Formato do Relatório</Label>
+          <Label htmlFor="format">Report Format</Label>
           <Select
             value={settings.reportFormat}
             onValueChange={(v) =>
@@ -67,17 +67,20 @@ export function SettingsPanel({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="markdown">Markdown</SelectItem>
-              {/* PDF disabled - requires GTK+ dependencies on Windows */}
+              <SelectItem value="markdown">Markdown (.md)</SelectItem>
+              <SelectItem value="pdf">PDF (.pdf)</SelectItem>
             </SelectContent>
           </Select>
+          <p className="text-xs text-muted-foreground">
+            Choose the format for report download
+          </p>
         </div>
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="severity">Incluir Severidade</Label>
+            <Label htmlFor="severity">Include Severity</Label>
             <p className="text-xs text-muted-foreground">
-              Exibir classificações Baixa/Média/Alta
+              Show Low/Medium/High ratings
             </p>
           </div>
           <Switch
@@ -91,9 +94,9 @@ export function SettingsPanel({
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="assumptions">Incluir Suposições</Label>
+            <Label htmlFor="assumptions">Include Assumptions</Label>
             <p className="text-xs text-muted-foreground">
-              Exibir incertezas e suposições
+              Show uncertainties and assumptions
             </p>
           </div>
           <Switch

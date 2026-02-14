@@ -27,11 +27,11 @@ export function ResultsSection({
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              Resultados da Análise
+              Analysis Results
             </h2>
             <p className="text-muted-foreground">
-              {result.components.length} componentes, {result.data_flows.length}{" "}
-              fluxos, {result.threats.length} ameaças identificadas
+              {result.components.length} components, {result.data_flows.length}{" "}
+              flows, {result.threats.length} threats identified
             </p>
           </div>
           <ResultsActionBar result={result} onNewAnalysis={onNewAnalysis} />

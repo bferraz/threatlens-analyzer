@@ -13,21 +13,20 @@ export function ExampleDiagram() {
         <div className="mx-auto max-w-4xl">
           <div className="mb-8 text-center">
             <h2 className="mb-3 text-2xl font-bold tracking-tight sm:text-3xl">
-              Exemplo de Arquitetura
+              Architecture Example
             </h2>
             <p className="text-muted-foreground">
-              Veja como o ThreatLens analisa uma arquitetura típica de aplicação
-              web
+              See how ThreatLens analyzes a typical web application architecture
             </p>
           </div>
 
           <div className="rounded-xl border border-border/50 bg-card p-6 shadow-lg">
             <div className="mb-4 flex items-center justify-between">
               <span className="text-sm font-medium text-muted-foreground">
-                Exemplo: Arquitetura Básica de API Web
+                Example: Basic Web API Architecture
               </span>
               <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
-                Diagrama Mermaid
+                Mermaid Diagram
               </span>
             </div>
             <MermaidPreview code={exampleDiagram} className="min-h-[280px]" />

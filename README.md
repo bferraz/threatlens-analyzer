@@ -6,7 +6,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109.0-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react)](https://reactjs.org)
 [![MongoDB](https://img.shields.io/badge/MongoDB-7.0-47A248?style=flat-square&logo=mongodb)](https://www.mongodb.com)
-[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4-412991?style=flat-square&logo=openai)](https://openai.com)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--5.2-412991?style=flat-square&logo=openai)](https://openai.com)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://www.docker.com)
 
 **Análise automatizada de ameaças STRIDE em diagramas de arquitetura usando IA**
@@ -47,7 +47,7 @@
 - **Checkboxes de Progresso**: Marque ameaças resolvidas
 - **Tracking por Step**: Acompanhe cada etapa de mitigação individualmente
 - **Busca e Filtros**: Por nome, descrição ou tags
-- **Exportação**: Relatórios em Markdown
+- **Exportação**: Relatórios em Markdown e PDF
 
 ### 🎨 Interface Moderna
 - **Design Responsivo**: Funciona em mobile, tablet e desktop
@@ -158,9 +158,9 @@ sequenceDiagram
     F->>U: Renderiza cards com:<br/>📊 stats, ✅ progress
 
     U->>F: Download relatório
-    F->>B: GET /api/analyses/{id}/report
-    B->>B: Gera Markdown
-    B-->>F: .md file
+    F->>B: GET /api/report/download/{filename}
+    B->>B: Gera Markdown ou PDF
+    B-->>F: .md ou .pdf file
     F->>U: Trigger download
 ```
 
@@ -191,7 +191,7 @@ backend/
 │   │                          └─ generate_mitigations()
 │   │
 │   ├── report_generator.py ► 📄 Geração de relatórios
-│   │                          └─ generate_markdown_report()
+│   │                          └─ generate_report() [MD/PDF]
 │   │
 │   └── analysis_routes.py ─► 🔌 CRUD Endpoints
 │                               └─ GET /api/analyses
@@ -227,7 +227,7 @@ front/src/
 │       ├── MitigationsCard.tsx ──► 🛡️ Lista de mitigações + ✅ steps
 │       ├── ComponentsCard.tsx ───► 🧩 Componentes identificados
 │       ├── DataFlowsCard.tsx ────► 🔄 Fluxos de dados
-│       └── ResultsActionBar.tsx ─► 💾 Salvar, 📥 Download
+│       └── ResultsActionBar.tsx ─► 💾 Salvar, 📥 Download MD/PDF
 │
 ├── services/
 │   ├── api.service.ts ─────► 🌐 Axios client
@@ -446,7 +446,7 @@ Frontend em: http://localhost:8081
 
 5. Configure opções (opcional):
    - Profundidade da análise
-   - Formato do relatório
+   - Formato do relatório (Markdown ou PDF)
    - Incluir severidade
    - Incluir assumptions
 
@@ -467,7 +467,7 @@ Frontend em: http://localhost:8081
 2. ✅ Marque checkboxes de ameaças resolvidas
 3. ✅ Clique em steps de mitigações implementadas
 4. 📈 Veja o progresso atualizar em tempo real
-5. 📥 Baixe o relatório completo
+5. 📥 Baixe o relatório completo (Markdown ou PDF)
 
 ---
 

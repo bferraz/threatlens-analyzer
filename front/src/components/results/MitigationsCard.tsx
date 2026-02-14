@@ -23,7 +23,7 @@ export function MitigationsCard({
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <CheckCircle className="h-5 w-5 text-accent" />
-          Mitigações Recomendadas
+          Recommended Mitigations
           <Badge variant="secondary" className="ml-auto">
             {totalSteps} steps
           </Badge>

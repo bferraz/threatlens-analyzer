@@ -18,7 +18,7 @@ export function DataFlowsCard({ dataFlows, components }: DataFlowsCardProps) {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <ArrowRight className="h-5 w-5 text-accent" />
-          Fluxos de Dados Detectados
+          Detected Data Flows
           <Badge variant="secondary" className="ml-auto">
             {dataFlows.length}
           </Badge>
